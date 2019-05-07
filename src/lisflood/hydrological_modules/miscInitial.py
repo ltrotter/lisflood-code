@@ -137,10 +137,6 @@ class miscInitial(object):
         self.var.EWRef = None
         # setting meteo data to none - is this necessary?
 
-       
-
-
-
         self.var.DayCounter= 0.0
         self.var.MonthETpot= globals.inZero
         self.var.MonthETact= globals.inZero
@@ -150,35 +146,33 @@ class miscInitial(object):
         self.var.MonthDis= globals.inZero
         self.var.MonthInternalFlow =  globals.inZero
 
+        self.var.TotalInternalFlowM3 = globals.inZero
+        self.var.PerMonthInternalFlowM3 = globals.inZero
+        # total freshwater generated in the sub-area (m3), basically local P-ET-Storage
+        self.var.TotalExternalInflowM3 = globals.inZero
+        self.var.PerMonthExternalInflowM3 = globals.inZero
+        # Total channel inflow (m3) from inlet points
+        self.var.PerMonthWaterDemandM3 = globals.inZero
+        self.var.PerMonthWaterUseM3 = globals.inZero
 
-        self.var.TotalInternalFlowM3 =  globals.inZero
-        self.var.PerMonthInternalFlowM3 =  globals.inZero
-	# total freshwater generated in the sub-area (m3), basically local P-ET-Storage
-        self.var.TotalExternalInflowM3 =  globals.inZero
-        self.var.PerMonthExternalInflowM3 =  globals.inZero
-	 # Total channel inflow (m3) from inlet points
-        self.var.PerMonthWaterDemandM3 =  globals.inZero
-        self.var.PerMonthWaterUseM3 =  globals.inZero
+        self.var.FlagDemandBiggerUse = scalar(0.0)
 
-        self.var.FlagDemandBiggerUse =  scalar(0.0)
+        self.var.TotWEI = scalar(0.0)
+        self.var.TotlWEI = scalar(0.0)
+        self.var.TotCount = scalar(0.0)
 
-
-        self.var.TotWEI =  scalar(0.0)
-        self.var.TotlWEI =  scalar(0.0)
-        self.var.TotCount =  scalar(0.0)
-
-        self.var.SumETpot =  globals.inZero
-        self.var.SumETpotact =   globals.inZero
+        self.var.SumETpot = globals.inZero
+        self.var.SumETpotact = globals.inZero
 
         # Read the latitude (radians) from the precipitation forcing NetCDF file
         with xr.open_dataset(binding["PrecipitationMaps"] + ".nc") as nc:
             if all([co in nc.dims for co in ("x", "y")]):
                 try:
-                    proj_var = [v for v in nc.data_vars.keys() if 'proj4_params' in nc[v].attrs.keys()][0] # look for the projection variable
+                    proj_var = [v for v in nc.data_vars.keys() if 'proj4_params' in nc[v].attrs.keys()][0]  # look for the projection variable
                 except IndexError:
                     raise Exception("If using projected coordinates (x, y), a variable with the 'proj4_params' attribute must be included in the precipitation file!")
                 projection = Proj(nc[proj_var].attrs['proj4_params']) # projection object obtained from the PROJ4 string
                 _, lat_deg = projection(*coordinatesLand(nc.x.values, nc.y.values), inverse=True) # latitude (degrees)
             else:
-                _, lat_deg = coordinatesLand(nc.lon.values, nc.lat.values) # latitude (degrees)
+                _, lat_deg = coordinatesLand(nc.lon.values, nc.lat.values)  # latitude (degrees)
         self.var.lat_rad = np.radians(lat_deg)  # latitude (radians)

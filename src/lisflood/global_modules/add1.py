@@ -157,11 +157,13 @@ def loadsetclone(name):
             map = boolean(iterReadPCRasterMap(filename))
             flagmap = True
             mapnp = pcr2numpy(map,np.nan)
+
         except:
             # try to read a netcdf file
             filename = os.path.splitext(binding[name])[0] + '.nc'
             nf1 = iterOpenNetcdf(filename, "", "r")
             value = nf1.variables.items()[-1][0]  # get the last variable name
+
             if 'x' in nf1.variables:
                 x1 = nf1.variables['x'][0]
                 x2 = nf1.variables['x'][1]
@@ -675,7 +677,7 @@ def checknetcdf(name, start, end):
     t_unit = nf1.variables['time'].units  # get unit (u'hours since 2015-01-01 06:00:00')
     t_cal = getCalendarType(nf1)
     if t_cal != binding['calendar_type']:
-        print(CalendarInconsistencyWarning(filename))
+        print(CalendarInconsistencyWarning(filename, t_cal, binding['calendar_type']))
 
     # get date of first available timestep in netcdf file
     date_first_step_in_ncdf = num2date(t_steps[0], units=t_unit, calendar=t_cal)

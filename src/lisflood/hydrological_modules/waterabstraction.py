@@ -99,11 +99,9 @@ class waterabstraction(object):
             if option['TransientWaterDemandChange'] and option['readNetcdfStack']:
                 for k in ('DomesticDemandMaps', 'IndustrialDemandMaps', 'LivestockDemandMaps', 'EnergyDemandMaps'):
                     with Dataset(binding[k] + '.nc') as nc:
-                        if getCalendarType(nc) != binding['calendar_type']:
-                            print(CalendarInconsistencyWarning(binding[k]))
-
-
-
+                        cal_type = getCalendarType(nc)
+                        if cal_type != binding['calendar_type']:
+                            print(CalendarInconsistencyWarning(binding[k], cal_type, binding['calendar_type']))
 
             if option['groundwaterSmooth']:
                 self.var.GroundwaterBodiesPcr = decompress(self.var.GroundwaterBodies)
@@ -111,7 +109,6 @@ class waterabstraction(object):
                 # nominal(scalar(GroundwaterBodies)*scalar(self.var.Catchments));
                 # smoothing for groundwater to correct error by using windowtotal, based on groundwater bodies and catchments
                 self.var.LZSmoothRange = loadmap('LZSmoothRange')
-
 
             if option['wateruseRegion']:
                 WUseRegion = nominal(loadmap('WUseRegion',pcr=True))
@@ -149,12 +146,12 @@ class waterabstraction(object):
                 # ************************************************************
 
                 self.var.WaterRegionOutflowPoints = ifthen(pitWuse != 0,boolean(1))
-	            # outflowpoints to calculate upstream inflow for balances and Water Exploitation Index
+                # outflowpoints to calculate upstream inflow for balances and Water Exploitation Index
 	            # both inland outflowpoints to downstream subbasin, and coastal outlets
 
                 WaterRegionInflow1=boolean(upstream(self.var.LddStructuresKinematic,cover(scalar(self.var.WaterRegionOutflowPoints),0)))
                 self.var.WaterRegionInflowPoints=ifthen(WaterRegionInflow1,boolean(1))
-	            # inflowpoints to calculate upstream inflow for balances and Water Exploitation Index
+                # inflowpoints to calculate upstream inflow for balances and Water Exploitation Index
 
             else:
                 self.var.downWRegion = self.var.downstruct.copy()

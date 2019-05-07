@@ -46,8 +46,10 @@ class LisfloodError(Exception):
            self._msg = header + msg +"\n" +  sys.exc_info()[1].message
         except:
            self._msg = header + msg +"\n"
+
     def __str__(self):
         return self._msg
+
 
 class LisfloodFileError(LisfloodError):
     """
@@ -55,16 +57,18 @@ class LisfloodFileError(LisfloodError):
     prints out an error
     """
     def __init__(self, filename,msg=""):
-        path,name = os.path.split(filename)
+        path, name = os.path.split(filename)
+        path = os.path.normpath(path)
         if os.path.exists(path):
-            text1 = "path: "+ path + " exists\nbut filename: "+name+ " does not\n"
-            text1 +="file name extension can be .map or .nc\n"
+            text1 = "path: " + path + " exists\nbut filename: " + name + " does not\n"
+            text1 += "file name extension can be .map or .nc\n"
         else:
-            text1 = "searching: "+filename
-            text1 += "\npath: "+ path + " does not exists\n"
+            text1 = "searching: " + filename
+            text1 += "\npath: " + path + " does not exists\n"
 
         header = "\n\n ======================== LISFLOOD FILE ERROR ===========================\n"
         self._msg = header + msg + text1
+
 
 class LisfloodWarning(Warning):
     """
@@ -74,8 +78,10 @@ class LisfloodWarning(Warning):
     def __init__(self, msg):
         header = "\n\n ========================== LISFLOOD Warning =============================\n"
         self._msg = header + msg
+
     def __str__(self):
         return self._msg
+
 
 class LisfloodRunInfo(Warning):
     """
@@ -93,8 +99,10 @@ class LisfloodRunInfo(Warning):
             msg += "   The simulation will try to use "+str(Cores)+" processors simultaneous\n"
         msg += "   The simulation output as specified in the settings file can be found in "+str(outputDir)+"\n"
         self._msg = header + msg
+
     def __str__(self):
         return self._msg
+
 
 def optionBinding(settingsfile, optionxml):
     """ Read XML settings and options files 
@@ -108,8 +116,7 @@ def optionBinding(settingsfile, optionxml):
     :param optionxml: path and name of Options.xml
     :return: binding, option, ReportSteps (as global variables)
     """
-    settings_path = os.path.dirname(settingsfile)
-    #model's settings from file settingsxml
+    settings_path = os.path.normpath(os.path.abspath(os.path.dirname(settingsfile)))
     optionSetting = {}
 
     # user defined path, parameters, calibration parameters, dates, ect from settingsxml
@@ -991,6 +998,7 @@ def getCalendarType(nc):
         print(LisfloodWarning("""The 'calendar' attribute of the 'time' variable of {} is not set: the default '{}' is used
                               (http://cfconventions.org/Data/cf-conventions/cf-conventions-1.7/cf-conventions.pdf)""".format(path_nc, calendar_type)))
     return calendar_type
-        
-def CalendarInconsistencyWarning(filename):        
-    return LisfloodWarning("The time.calendar attribute of {} differs from that of precipitation!".format(filename))
+
+
+def CalendarInconsistencyWarning(filename, file_calendar, precipitation_calendar):
+    return LisfloodWarning("In file {}, time.calendar attribute ({}) differs from that of precipitation ({})!".format(filename, file_calendar, precipitation_calendar))
