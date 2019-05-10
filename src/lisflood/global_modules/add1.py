@@ -793,36 +793,36 @@ def writenet(flag, inputmap, netfile, DtDay,
         # Dimension
         if 'x' in metadataNCDF.keys():
             lon = nf1.createDimension('x', col)  # x 1000
-            longitude = nf1.createVariable('x', 'f8', ('x',), fill_value=default_fillvals['f8'])
+            longitude = nf1.createVariable('x', 'f8', ('x',))
             for i in metadataNCDF['x']:
                 exec('%s="%s"') % ("longitude." + i, metadataNCDF['x'][i])
 
         if 'lon' in metadataNCDF.keys():
             lon = nf1.createDimension('lon', col)
-            longitude = nf1.createVariable('lon', 'f8', ('lon',), fill_value=default_fillvals['f8'])
+            longitude = nf1.createVariable('lon', 'f8', ('lon',))
             for i in metadataNCDF['lon']:
                 exec('%s="%s"') % ("longitude." + i, metadataNCDF['lon'][i])
 
         if 'y' in metadataNCDF.keys():
             lat = nf1.createDimension('y', row)  # x 950
-            latitude = nf1.createVariable('y', 'f8', ('y',), fill_value=default_fillvals['f8'])
+            latitude = nf1.createVariable('y', 'f8', ('y',))
             for i in metadataNCDF['y']:
                 exec('%s="%s"') % ("latitude." + i, metadataNCDF['y'][i])
 
         if 'lat' in metadataNCDF.keys():
             lat = nf1.createDimension('lat', row)  # x 950
-            latitude = nf1.createVariable('lat', 'f8', ('lat',), fill_value=default_fillvals['f8'])
+            latitude = nf1.createVariable('lat', 'f8', ('lat',))
             for i in metadataNCDF['lat']:
                 exec('%s="%s"') % ("latitude." + i, metadataNCDF['lat'][i])
             # projection
 
         if 'laea' in metadataNCDF.keys():
-            proj = nf1.createVariable('laea', 'i4', fill_value=default_fillvals['i4'])
+            proj = nf1.createVariable('laea', 'i4')
             for i in metadataNCDF['laea']:
                 exec('%s="%s"') % ("proj." + i, metadataNCDF['laea'][i])
 
         if 'lambert_azimuthal_equal_area' in metadataNCDF.keys():
-            proj = nf1.createVariable('lambert_azimuthal_equal_area', 'i4', fill_value=default_fillvals['i4'])
+            proj = nf1.createVariable('lambert_azimuthal_equal_area', 'i4')
             for i in metadataNCDF['lambert_azimuthal_equal_area']:
                 exec('%s="%s"') % ("proj." + i, metadataNCDF['lambert_azimuthal_equal_area'][i])
         """
