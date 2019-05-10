@@ -193,41 +193,46 @@ class outputTssMap(object):
                 checkifdouble.append(where)
                 # checks if saved at same place, if no: add to list
                 if self.var.currentTimeStep() in self.var.ReportSteps:
-                  flagcdf = 1  # index flag for writing nedcdf = 1 (=steps) -> indicated if a netcdf is created or maps are appended
-                  frequency = "all"
-                  try:
-                      if reportMapsSteps[maps]['monthly'][0] =="True":
-                         monthly = True
-                         flagcdf = 3 # set to monthly (step) flag
-                         frequency = "monthly"
-                  except:
-                     monthly = False
-                  try:
-                      if reportMapsSteps[maps]['yearly'][0] =="True":
-                         yearly = True
-                         flagcdf = 4 # set to yearly (step) flag
-                         frequency = "annual"
-                  except:
-                     yearly = False
-                  if (monthly and self.var.monthend) or (yearly and self.var.yearend) or (monthly==False and yearly==False):
-                  # checks if a flag monthly or yearly exists
-                    if option['writeNetcdfStack']:
-                        #Get start date for reporting start step
-                        reportStartDate = inttoDate(self.var.ReportSteps[0]-1,self.var.CalendarDayStart)
-                        #get step number for first reporting step
-                        reportStepStart = self.var.ReportSteps[0]-self.var.ReportSteps[0]+1
-                        #get step number for last reporting step
-                        reportStepEnd = self.var.ReportSteps[-1]-self.var.ReportSteps[0]+1
-                        try:
-                            writenet(globals.cdfFlag[flagcdf], eval(what), where, self.var.DtDay, maps, reportMapsSteps[
-                                     maps]['outputVar'][0], reportMapsSteps[maps]['unit'][0], 'f4', reportStartDate,reportStepStart,reportStepEnd,frequency)
-                        except:
-                            print "REP", what, where, self.var.DtDay, maps, reportMapsSteps[
-                            maps]['outputVar'][0], reportMapsSteps[maps]['unit'][0], 'f4', reportStartDate,reportStepStart,reportStepEnd
-                        
+                    flagcdf = 1  # index flag for writing nedcdf = 1 (=steps) -> indicated if a netcdf is created or maps are appended
+                    frequency = "all"
+                    try:
+                        if reportMapsSteps[maps]['monthly'][0] == "True":
+                            monthly = True
+                            flagcdf = 3  # set to monthly (step) flag
+                            frequency = "monthly"
+                    except:
+                        monthly = False
+                    try:
+                        if reportMapsSteps[maps]['yearly'][0] == "True":
+                            yearly = True
+                            flagcdf = 4 # set to yearly (step) flag
+                            frequency = "annual"
+                    except:
+                        yearly = False
+                    if (monthly and self.var.monthend) or (yearly and self.var.yearend) or (monthly is False and yearly is False):
+                        # checks if a flag monthly or yearly exists
+                        if option['writeNetcdfStack']:
+                            # Get start date for reporting start step
+                            reportStartDate = inttoDate(self.var.ReportSteps[0]-1,self.var.CalendarDayStart)
+                            # get step number for first reporting step
+                            reportStepStart = self.var.ReportSteps[0]-self.var.ReportSteps[0]+1
+                            # get step number for last reporting step
+                            reportStepEnd = self.var.ReportSteps[-1]-self.var.ReportSteps[0]+1
+                            try:
+                                writenet(globals.cdfFlag[flagcdf], eval(what), where, self.var.DtDay, maps,
+                                         reportMapsSteps[maps]['outputVar'][0], reportMapsSteps[maps]['unit'][0], 'f4',
+                                         reportStartDate, reportStepStart, reportStepEnd, frequency)
+                            except Exception as e:
+                                raw_input('error...')
+                                print " +----> ERR: {} - {}".format(type(e), e)
+                                print "REP flag:{} - {} {} {} {} {} {} {} {} {} {}".format(
+                                    globals.cdfFlag[flagcdf], what, where, self.var.DtDay, maps,
+                                    reportMapsSteps[maps]['outputVar'][0], reportMapsSteps[maps]['unit'][0], 'f4',
+                                    reportStartDate, reportStepStart, reportStepEnd
+                                )
+
                     else:
                         self.var.report(decompress(eval(what)), where)
-
 
         # Report ALL maps
         for maps in reportMapsAll.keys():

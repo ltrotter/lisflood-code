@@ -537,7 +537,7 @@ def Calendar(input):
         # try reading a date in one of available formats
         try:
             _t_units = "hours since 1970-01-01 00:00:00" # units used for date type conversion (datetime.datetime -> calendar-specific if needed)
-            date = parse_time_string(input)[0] # datetime.datetime type
+            date = parse_time_string(input, dayfirst=True)[0]  # datetime.datetime type
             step = date2num(date, _t_units, binding["calendar_type"]) # float type
             return num2date(step, _t_units, binding["calendar_type"]) # calendar-dependent type from netCDF4.netcdftime._netcdftime module
         except:    

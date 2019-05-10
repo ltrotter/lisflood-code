@@ -135,40 +135,6 @@ AREA AND OUTLETS
 
 
 
-
-<textvar name="timestepInit" value="1">
-<comment>
-if init. condition are stored as netCDF with different time steps
-this variable indicates which time step to use
-Either as date e.g. 1/1/2010 or as number e.g. 5
-</comment>
-</textvar>
-
-<textvar name="OFDirectInitValue" value="0">
-<comment>
-Reported water direct
-</comment>
-</textvar>
-
-<textvar name="OFOtherInitValue" value="0">
-<comment>
-Reported water other
-</comment>
-</textvar>
-
-<textvar name="OFForestInitValue" value="0">
-<comment>
-Reported water forest
-</comment>
-</textvar>
-
-<textvar name="SnowCoverAInitValue" value="0">
-<comment>
-initial snow depth in snow zone A [mm]
-</comment>
-</textvar>
-
-
 <textvar name="PathRoot" value="$(SettingsDir)/../">
 
 <comment>

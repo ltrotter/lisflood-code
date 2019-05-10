@@ -9,7 +9,7 @@
 # Licence:     <your licence>
 # -------------------------------------------------------------------------
 from zusatz import *
-from netCDF4 import num2date, date2num
+from netCDF4 import num2date, date2num, default_fillvals
 from pandas import date_range
 import numpy as np
 import time as xtime
@@ -89,7 +89,7 @@ def metaNetCDF():
         filename = os.path.splitext(binding['netCDFtemplate'])[0] + '.nc'
         nf1 = iterOpenNetcdf(filename, "", 'r')
         for var in nf1.variables:
-           metadataNCDF[var] = nf1.variables[var].__dict__
+           metadataNCDF[var] = {k: v for k, v in nf1.variables[var].__dict__.iteritems() if k !='_FillValue'}
         nf1.close()
         return
     except:
@@ -98,7 +98,7 @@ def metaNetCDF():
     filename = os.path.splitext(binding['E0Maps'])[0] + '.nc'
     nf1 = iterOpenNetcdf(filename, "Trying to get metadata from netcdf \n", 'r')
     for var in nf1.variables:
-       metadataNCDF[var] = nf1.variables[var].__dict__
+       metadataNCDF[var] = {k: v for k, v in nf1.variables[var].__dict__.iteritems() if k !='_FillValue'}
     nf1.close()
 
 
@@ -753,9 +753,9 @@ def generateName(name, time):
     return os.path.join(head, result)
 
 
-
-def writenet(flag, inputmap, netfile, DtDay, value_standard_name, value_long_name, value_unit, fillval, startdate,repstepstart,repstepend,
-             frequency=None):
+def writenet(flag, inputmap, netfile, DtDay,
+             value_standard_name, value_long_name, value_unit, data_format,
+             startdate, repstepstart, repstepend, frequency=None):
 
     """ Write a netcdf stack
 
@@ -766,7 +766,7 @@ def writenet(flag, inputmap, netfile, DtDay, value_standard_name, value_long_nam
     :param value_standard_name: variable name to be put into netCDF file
     :param value_long_name: variable long name to be put into netCDF file
     :param value_unit: variable unit to be put into netCDF file
-    :param fillval: data format
+    :param data_format: data format
     :param startdate: reference date to be used to get start date and end date for netCDF file from start step and end step
     :param: repstepstart: first reporting step
     :param: repstepend: final reporting step
@@ -784,9 +784,8 @@ def writenet(flag, inputmap, netfile, DtDay, value_standard_name, value_long_nam
         # general Attributes
         nf1.settingsfile = os.path.realpath(sys.argv[1])
         nf1.date_created = xtime.ctime(xtime.time())
-        #nf1.xmlstring = xmlstring[0]
         nf1.Source_Software = 'Lisflood Python'
-        nf1.institution = "European Commission DG Joint Research Centre (JRC)"
+        nf1.institution = "European Commission DG Joint Research Centre (JRC) - E1, D2 Units"
         nf1.creator_name = "Peter Burek, A de Roo, Johan van der Knijff"
         nf1.source = 'Lisflood output maps'
         nf1.keywords = "Lisflood, EFAS, GLOFAS"
@@ -794,34 +793,38 @@ def writenet(flag, inputmap, netfile, DtDay, value_standard_name, value_long_nam
         # Dimension
         if 'x' in metadataNCDF.keys():
             lon = nf1.createDimension('x', col)  # x 1000
-            longitude = nf1.createVariable('x', 'f8', ('x',))
+            longitude = nf1.createVariable('x', 'f8', ('x',), fill_value=default_fillvals['f8'])
             for i in metadataNCDF['x']:
                 exec('%s="%s"') % ("longitude." + i, metadataNCDF['x'][i])
+
         if 'lon' in metadataNCDF.keys():
             lon = nf1.createDimension('lon', col)
-            longitude = nf1.createVariable('lon', 'f8', ('lon',))
+            longitude = nf1.createVariable('lon', 'f8', ('lon',), fill_value=default_fillvals['f8'])
             for i in metadataNCDF['lon']:
                 exec('%s="%s"') % ("longitude." + i, metadataNCDF['lon'][i])
+
         if 'y' in metadataNCDF.keys():
             lat = nf1.createDimension('y', row)  # x 950
-            latitude = nf1.createVariable('y', 'f8', ('y'))
+            latitude = nf1.createVariable('y', 'f8', ('y',), fill_value=default_fillvals['f8'])
             for i in metadataNCDF['y']:
                 exec('%s="%s"') % ("latitude." + i, metadataNCDF['y'][i])
+
         if 'lat' in metadataNCDF.keys():
             lat = nf1.createDimension('lat', row)  # x 950
-            latitude = nf1.createVariable('lat', 'f8', ('lat'))
+            latitude = nf1.createVariable('lat', 'f8', ('lat',), fill_value=default_fillvals['f8'])
             for i in metadataNCDF['lat']:
                 exec('%s="%s"') % ("latitude." + i, metadataNCDF['lat'][i])
-        # projection
+            # projection
+
         if 'laea' in metadataNCDF.keys():
-            proj = nf1.createVariable('laea', 'i4')
+            proj = nf1.createVariable('laea', 'i4', fill_value=default_fillvals['i4'])
             for i in metadataNCDF['laea']:
                 exec('%s="%s"') % ("proj." + i, metadataNCDF['laea'][i])
+
         if 'lambert_azimuthal_equal_area' in metadataNCDF.keys():
-            proj = nf1.createVariable('lambert_azimuthal_equal_area', 'i4')
+            proj = nf1.createVariable('lambert_azimuthal_equal_area', 'i4', fill_value=default_fillvals['i4'])
             for i in metadataNCDF['lambert_azimuthal_equal_area']:
-                exec('%s="%s"') % (
-                    "proj." + i, metadataNCDF['lambert_azimuthal_equal_area'][i])
+                exec('%s="%s"') % ("proj." + i, metadataNCDF['lambert_azimuthal_equal_area'][i])
         """
         EUROPE
         proj.grid_mapping_name='lambert_azimuthal_equal_area'
@@ -884,24 +887,16 @@ def writenet(flag, inputmap, netfile, DtDay, value_standard_name, value_long_nam
             time.calendar = binding["calendar_type"]
             nf1.variables["time"][:] = date2num(time_stamps, time.units, time.calendar)
             # for i in metadataNCDF['time']: exec('%s="%s"') % ("time."+i, metadataNCDF['time'][i])
-            # value = nf1.createVariable(prefix,fillval,('time','y','x'),zlib=True)
             if 'x' in metadataNCDF.keys():
-                # value = nf1.createVariable(prefix, fillval, ('time', 'y', 'x'), zlib=True, fill_value=-9999)
-                value = nf1.createVariable(prefix, fillval, ('time', 'y', 'x'), zlib=True, fill_value=-9999,
-                                           chunksizes=(1, row, col))
-                # value = nf1.createVariable(prefix, fillval, ('y', 'x'), zlib=True,fill_value=-9999)
+                value = nf1.createVariable(prefix, data_format, ('time', 'y', 'x'), zlib=True, fill_value=-9999, chunksizes=(1, row, col))
             if 'lon' in metadataNCDF.keys():
-                value = nf1.createVariable(prefix, fillval, ('time', 'lat', 'lon'), zlib=True, fill_value=-9999,
-                                           chunksizes=(1, row, col))
+                value = nf1.createVariable(prefix, data_format, ('time', 'lat', 'lon'), zlib=True, fill_value=-9999, chunksizes=(1, row, col))
         else:
             if 'x' in metadataNCDF.keys():
-                # value = nf1.createVariable(prefix,fillval,('y','x'),zlib=True)
-                value = nf1.createVariable(prefix, fillval, ('y', 'x'), zlib=True, fill_value=-9999)
-                # value = nf1.createVariable(prefix,'f4',('time','lat','lon'),zlib=True,complevel=9,least_significant_digit=digit)
-                # value = nf1.createVariable(prefix,'f4',('time','lat','lon'),zlib=True,least_significant_digit=digit)
+                value = nf1.createVariable(prefix, data_format, ('y', 'x'), zlib=True, fill_value=-9999)
             if 'lon' in metadataNCDF.keys():
                 # for world lat/lon coordinates
-                value = nf1.createVariable(prefix, fillval, ('lat', 'lon'), zlib=True, fill_value=-9999)
+                value = nf1.createVariable(prefix, data_format, ('lat', 'lon'), zlib=True, fill_value=-9999)
 
         value.standard_name = value_standard_name
         value.long_name = value_long_name
