@@ -56,7 +56,7 @@ class groundwater(object):
         LZAvInflowGuess = makenumpy(LZAvInflowGuess)
 
         LZSteady = LZAvInflowGuess * LowerZoneTimeConstant
-               # Steady-state amount of water in lower store [mm]
+        # Steady-state amount of water in lower store [mm]
         LZInitValue = loadmap('LZInitValue')
 
         self.var.LZ = np.where(LZInitValue == -9999, LZSteady, LZInitValue)
@@ -65,9 +65,7 @@ class groundwater(object):
         
         # Water in lower store [mm]
         self.var.LZThreshold = loadmap('LZThreshold')
-          # lz threshold =if lz falls below this there is no outflow to the channel from lz
-
-
+        # lz threshold =if lz falls below this there is no outflow to the channel from lz
 
         # UZInitValue=scalar(loadmap('UZInitValue'))
         # UZInit=ifthen(defined(self.var.MaskMap),UZInitValue)
@@ -93,19 +91,18 @@ class groundwater(object):
         self.var.LZOutflow = globals.inZero.copy()
 
 
-
     def dynamic(self):
         # outflow from LZ to channel stops when LZ is below its threshold. LZ can be below its threshold because of water abstractions
         self.var.LZOutflow = np.minimum(self.var.LowerZoneK * self.var.LZ,self.var.LZ - self.var.LZThreshold)
-      	# Outflow out of lower zone [mm per model timestep]
+        # Outflow out of lower zone [mm per model timestep]
 
         self.var.LZOutflow = np.maximum(self.var.LZOutflow, 0)        
         # No outflow if LZ is below threshold
         self.var.LZOutflowToChannel = self.var.LZOutflow
-      	# And the remaining amount goes to the channel
+        # And the remaining amount goes to the channel
 
         self.var.LZ -= self.var.LZOutflow
-       	# Update upper-, lower zone storage
+        # Update upper-, lower zone storage
 
         self.var.UZOutflowPixel = self.var.deffraction(self.var.UZOutflow)
           # outflow from upper zone as pixel flow
@@ -140,4 +137,3 @@ class groundwater(object):
 	    # Average inflow into lower zone over executed time steps [mm/day]
 
         self.var.LZOutflowToChannelPixel = self.var.LZOutflowToChannel
-
