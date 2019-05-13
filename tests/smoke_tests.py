@@ -10,7 +10,6 @@ current_dir = os.path.dirname(os.path.abspath(__file__))
 
 
 class TestDrina(object):
-    domain = 'efas'
     settings_path = os.path.join(current_dir, 'data/Drina/settings/lisfloodSettings_cold_day_base.xml')
 
     @classmethod

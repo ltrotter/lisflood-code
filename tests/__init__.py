@@ -69,4 +69,3 @@ def listest(variable):
         return wrapper
 
     return decorator
-
