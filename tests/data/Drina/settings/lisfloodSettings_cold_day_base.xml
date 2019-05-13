@@ -38,12 +38,12 @@
 
         <setoption choice="0" name="repEndMaps"/>
 
-        <setoption choice="1" name="repStateMaps"/>
+        <setoption choice="0" name="repStateMaps"/>
 
         <setoption choice="1" name="repDischargeTs"/>
 
 
-        <setoption choice="0" name="repDischargeMaps"/>
+        <setoption choice="1" name="repDischargeMaps"/>
 
 
         # report gauges and sites
@@ -52,16 +52,16 @@
 
         <setoption choice="0" name="repRateSites"/>
 
-        <setoption choice="1" name="repStateUpsGauges"/>
+        <setoption choice="0" name="repStateUpsGauges"/>
 
-        <setoption choice="1" name="repRateUpsGauges"/>
+        <setoption choice="0" name="repRateUpsGauges"/>
 
-        <setoption choice="1" name="repMeteoUpsGauges"/>
+        <setoption choice="0" name="repMeteoUpsGauges"/>
 
 
-        <setoption choice="1" name="repsimulateLakes"/>
+        <setoption choice="0" name="repsimulateLakes"/>
 
-        <setoption choice="1" name="repsimulateReservoirs"/>
+        <setoption choice="0" name="repsimulateReservoirs"/>
 
         <setoption choice="0" name="repSnowMaps"/>
 
@@ -266,7 +266,7 @@
             </textvar>
 
 
-            <textvar name="StepStart" value="02/01/1990 06:00">
+            <textvar name="StepStart" value="02/01/2000 06:00">
 
                 <comment>
 
@@ -277,7 +277,7 @@
             </textvar>
 
 
-            <textvar name="StepEnd" value="17/02/1990 06:00">
+            <textvar name="StepEnd" value="22/02/2000 06:00">
 
                 <comment>
 

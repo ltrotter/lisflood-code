@@ -8,6 +8,8 @@
 # Copyright:   (c) burekpe 2014
 # Licence:     <your licence>
 # -------------------------------------------------------------------------
+from pcraster._pcraster import Scalar
+
 from zusatz import *
 from netCDF4 import num2date, date2num, default_fillvals
 from pandas import date_range
@@ -540,7 +542,6 @@ def readmapsparse(name, time, oldmap):
     return mapC
 
 
-
 def readnetcdf(name, time, timestampflag='exact', averageyearflag=False):
     """ Read maps from netCDF stacks (forcings, fractions, water demand)
 
@@ -561,11 +562,11 @@ def readnetcdf(name, time, timestampflag='exact', averageyearflag=False):
     :except: if current simulation timestep is not stored in the stack, it stops with error message (if timestampflag='exact')
     """
 
-    filename = name + ".nc"
+    filename = name + ".nc" if not name.endswith('.nc') else name
     nf1 = iterOpenNetcdf(filename, "Netcdf map stacks: \n", "r")
 
     # read information from netCDF file
-    variable_name = nf1.variables.items()[-1][0]        # get name of the last variable
+    variable_name = nf1.variables.items()[-1][0]        # get name of the last variable  # FIXME danger!!!
     t_steps = nf1.variables['time'][:]    # get values for timesteps ([  0.,  24.,  48.,  72.,  96.])
     t_unit = nf1.variables['time'].units  # get unit (u'hours since 2015-01-01 06:00:00')
     t_cal = getCalendarType(nf1)
@@ -612,15 +613,13 @@ def readnetcdf(name, time, timestampflag='exact', averageyearflag=False):
 
     # get index of timestep in netCDF file corresponding to current simulation date
     current_ncdf_index = np.where(t_steps == current_ncdf_step)[0][0]
-    # mapnp = nf1.variables[variable_name][time - 1, cutmap[2]:cutmap[3], cutmap[0]:cutmap[1]]
     mapnp = nf1.variables[variable_name][current_ncdf_index, cutmap[2]:cutmap[3], cutmap[0]:cutmap[1]]
-
     nf1.close()
+
     mapC = compressArray(mapnp, pcr=False, name=filename)
-    timename = os.path.basename(name) + str(time)
     if Flags['check']:
-        map = decompress(mapC)
-        checkmap(timename, filename, map, True, 1)
+        timename = os.path.basename(name) + str(time)
+        checkmap(timename, filename, decompress(mapC), True, 1)
     return mapC
 
 
