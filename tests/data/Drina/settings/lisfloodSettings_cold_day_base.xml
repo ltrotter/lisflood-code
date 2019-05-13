@@ -3,31 +3,31 @@
 
     <lfoptions>
 
-        <setoption choice="0" name="wateruse"/>
+        <setoption choice="1" name="wateruse"/>
 
-        <setoption choice="0" name="groundwaterSmooth"/>
+        <setoption choice="1" name="groundwaterSmooth"/>
 
-        <setoption choice="0" name="TransientWaterDemandChange"/>
+        <setoption choice="1" name="TransientWaterDemandChange"/>
 
-        <setoption choice="0" name="useWaterDemandAveYear"/>
+        <setoption choice="1" name="useWaterDemandAveYear"/>
 
-        <setoption choice="0" name="wateruseRegion"/>
-
-
-        <setoption choice="0" name="indicator"/>
+        <setoption choice="1" name="wateruseRegion"/>
 
 
-        <setoption choice="0" name="drainedIrrigation"/>
+        <setoption choice="1" name="indicator"/>
 
-        <setoption choice="0" name="riceIrrigation"/>
 
-        <setoption choice="0" name="openwaterevapo"/>
+        <setoption choice="1" name="drainedIrrigation"/>
 
-        <setoption choice="0" name="simulateLakes"/>
+        <setoption choice="1" name="riceIrrigation"/>
 
-        <setoption choice="0" name="simulateReservoirs"/>
+        <setoption choice="1" name="openwaterevapo"/>
 
-        <setoption choice="0" name="simulatePF"/>
+        <setoption choice="1" name="simulateLakes"/>
+
+        <setoption choice="1" name="simulateReservoirs"/>
+
+        <setoption choice="1" name="simulatePF"/>
 
 
         <setoption choice="1" name="SplitRouting"/>

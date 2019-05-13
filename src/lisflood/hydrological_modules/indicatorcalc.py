@@ -40,30 +40,30 @@ class indicatorcalc(object):
             self.var.DefineEndofYear = 365
 
         if option['indicator']:
+            # population per pixel
             self.var.Population = loadmap('Population')
-                # population per pixel
-            #self.var.WUseRegionC is not initialized if wateruse=0
-            if option['wateruse']:
-                self.var.RegionPopulation = np.take(np.bincount(self.var.WUseRegionC,weights=self.var.Population),self.var.WUseRegionC)
-                # population sum in Regions
+            # map to mask out deserts and high mountains (to cover ETdif map, otherwise Sahara etc would pop out; meant as a drought indicator
             self.var.LandUseMask = loadmap('LandUseMask')
-                # map to mask out deserts and high mountains (to cover ETdif map, otherwise Sahara etc would pop out; meant as a drought indicator
 
-        if option['wateruse'] and option['indicator']:
-        # set to 0 at start
-            self.var.DayCounter = 0
-            self.var.MonthETpotMM =   globals.inZero.copy()
-            self.var.MonthETactMM =   globals.inZero.copy()
+            if option['wateruse']:
+                self.var.RegionPopulation = np.take(np.bincount(self.var.WUseRegionC, weights=self.var.Population), self.var.WUseRegionC)
+                # population sum in Regions
 
-            self.var.MonthWDemandM3 = globals.inZero.copy()
-            self.var.MonthWAbstractionM3 = globals.inZero.copy()
-            self.var.MonthWConsumptionM3 = globals.inZero.copy()
-            self.var.MonthDisM3 =     globals.inZero.copy()
-            self.var.MonthInternalFlowM3 = globals.inZero.copy()
-            self.var.MonthExternalInflowM3 = globals.inZero.copy()
-            self.var.RegionMonthIrrigationShortageM3 = globals.inZero.copy()
-            self.var.MonthWaterAbstractedfromLakesReservoirsM3 = globals.inZero.copy()
+                # set to 0 at start
+                self.var.DayCounter = 0
+                self.var.MonthETpotMM = globals.inZero.copy()
+                self.var.MonthETactMM = globals.inZero.copy()
 
+                self.var.MonthWDemandM3 = globals.inZero.copy()
+                self.var.MonthWAbstractionM3 = globals.inZero.copy()
+                self.var.MonthWConsumptionM3 = globals.inZero.copy()
+                self.var.MonthDisM3 = globals.inZero.copy()
+                self.var.MonthInternalFlowM3 = globals.inZero.copy()
+                self.var.MonthExternalInflowM3 = globals.inZero.copy()
+                self.var.RegionMonthIrrigationShortageM3 = globals.inZero.copy()
+                self.var.MonthWaterAbstractedfromLakesReservoirsM3 = globals.inZero.copy()
+
+                self.var.LakeStorageM3 = globals.inZero.copy()
 
     def dynamic(self):
         """ dynamic part of the indicator calculation module
@@ -71,9 +71,8 @@ class indicatorcalc(object):
 
         if option['TransientLandUseChange']:
             self.var.Population = readnetcdf(binding['PopulationMaps'], self.var.currentTimeStep())
-            self.var.RegionPopulation = np.take(np.bincount(self.var.WUseRegionC,weights=self.var.Population),self.var.WUseRegionC)
-                # population sum in Regions
-
+            self.var.RegionPopulation = np.take(np.bincount(self.var.WUseRegionC, weights=self.var.Population), self.var.WUseRegionC)
+            # population sum in Regions
 
         if option['wateruse'] and option['indicator']:
             # check if it is the last monthly or annual time step
@@ -84,15 +83,17 @@ class indicatorcalc(object):
             self.var.DayCounter   = self.var.DayCounter + 1.0
             self.var.MonthETpotMM   = self.var.MonthETpotMM + self.var.ETRef
             self.var.MonthETactMM   = self.var.MonthETactMM + self.var.deffraction(self.var.TaInterception) + self.var.TaPixel + self.var.ESActPixel
+
             if option['openwaterevapo']:
                 self.var.MonthETactMM += self.var.EvaAddM3 * self.var.M3toMM
-            self.var.MonthETdifMM   = np.maximum((self.var.MonthETpotMM - self.var.MonthETactMM)*self.var.LandUseMask,globals.inZero)
-                # ; land use mask can be used to mask out deserts and high mountains, where no agriculture is possible
+
+            self.var.MonthETdifMM = np.maximum((self.var.MonthETpotMM - self.var.MonthETactMM)*self.var.LandUseMask,globals.inZero)
+            # ; land use mask can be used to mask out deserts and high mountains, where no agriculture is possible
 
             self.var.MonthWDemandM3 = self.var.MonthWDemandM3 + self.var.TotalDemandM3
             self.var.MonthWAbstractionM3 = self.var.MonthWAbstractionM3 + self.var.TotalAbstractionFromSurfaceWaterM3 + self.var.ReservoirAbstractionM3 + self.var.LakeAbstractionM3 + self.var.TotalAbstractionFromGroundwaterM3
             self.var.MonthWConsumptionM3 = self.var.MonthWConsumptionM3  + self.var.WUseAddM3 + self.var.ReservoirAbstractionM3 + self.var.LakeAbstractionM3 + self.var.TotalAbstractionFromGroundwaterM3
-            self.var.MonthDisM3     =	self.var.MonthDisM3 + self.var.ChanQAvg * self.var.DtSec
+            self.var.MonthDisM3 = self.var.MonthDisM3 + self.var.ChanQAvg * self.var.DtSec
 
             self.var.MonthWaterAbstractedfromLakesReservoirsM3 = self.var.MonthWaterAbstractedfromLakesReservoirsM3 + self.var.ReservoirAbstractionM3 + self.var.LakeAbstractionM3
 
@@ -101,8 +102,6 @@ class indicatorcalc(object):
             # INTERNAL FLOW
             self.var.MonthInternalFlowM3 = self.var.MonthInternalFlowM3 + self.var.ToChanM3Runoff
 
-
-
             # --------------------------------------------------------------------------
 
             if self.var.monthend:
@@ -110,7 +109,7 @@ class indicatorcalc(object):
                 # INTERNAL FLOW
                 if option['simulateReservoirs'] or option['simulateLakes']:
                     # available LakeStorageM3 and ReservoirStorageM3 for potential abstraction at end of month in region
-                    self.var.RegionMonthReservoirAndLakeStorageM3 = np.take(np.bincount(self.var.WUseRegionC,weights=(self.var.ReservoirStorageM3+self.var.LakeStorageM3)),self.var.WUseRegionC)
+                    self.var.RegionMonthReservoirAndLakeStorageM3 = np.take(np.bincount(self.var.WUseRegionC, weights=(self.var.ReservoirStorageM3 + self.var.LakeStorageM3)), self.var.WUseRegionC)
 
                 # monthly abstraction from lakes and reservoirs
                 self.var.RegionMonthWaterAbstractedfromLakesReservoirsM3 = np.take(np.bincount(self.var.WUseRegionC,weights=self.var.MonthWaterAbstractedfromLakesReservoirsM3),self.var.WUseRegionC)

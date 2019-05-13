@@ -1,26 +1,22 @@
 import os
 from functools import wraps
-import datetime
 
-from netCDF4 import Dataset
-from netCDF4._netCDF4 import date2num
 from pyexpat import *
 import numpy as np
-from pcraster.numpy_operations import pcr2numpy
 
 from lisflood.global_modules.add1 import readnetcdf
-from lisflood.global_modules.globals import outputDir, modelSteps, binding, reportMapsSteps
+from lisflood.global_modules.globals import modelSteps, binding
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
 reference_files = {
     'dis': {'outpath': os.path.join(current_dir, 'data/Drina/reference/dis'),
-            'report_map': 'DischargeMaps'}
+            'report_map': 'DischargeMaps',
+            'report_tss': 'DisTS'}
 }
 atol = 0.01
 
 
 def check_var_step(variable, step):
-    print('Check {} at step {}'.format(variable, step))
     reference_path = reference_files[variable]['outpath']
     output_path = binding[reference_files[variable]['report_map']]
     reference = readnetcdf(reference_path, step)
@@ -61,7 +57,7 @@ def listest(variable):
         @wraps(f)
         def wrapper(*args, **kwds):
             reference_path = reference_files[variable]['outpath']
-            output_path = binding[reference_files[variable]['report_map']]
+            output_path = os.path.normpath(binding[reference_files[variable]['report_map']])
             print '>>> Reference: {} - Current Output: {}'.format(reference_path, output_path)
             results = []
             start_step, end_step = modelSteps[0], modelSteps[1]
