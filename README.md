@@ -83,7 +83,7 @@ Once LISFLOOD finished, you can find reported maps in `/absolute_path/to/my/loca
 
 ### Pypi packaged LISFLOOD
 
-LISFLOOD is also distributed as a standard python package. You can install the pip package in your Python 2.7[^1] virtualenv:
+LISFLOOD is also distributed as a standard python package. You can install the pip package in your Python 2.7<sup>[1](#footnote1)</sup> virtualenv:
 
 ```bash
 pip install lisflood-model
@@ -95,4 +95,4 @@ Commando above will also install the executable `lisflood` in the virtualenv, so
 lisflood /absolute_path/to/my/local/folder/Drina/settings/lisfloodSettings_cold_day_base.xml
 ```
 
-[^1]: We planned to migrate to Python 3 in a few months.
+<a id="footnote1" name="footnote1">1</a>: We planned to migrate to Python 3 in a few months.
